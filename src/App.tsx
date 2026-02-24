@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { QRCodeCanvas } from 'qrcode.react';
+// Видаляємо імпорт QRCodeCanvas, бо він тепер живе в QrDisplay
 import { InputForm } from './components/InputForm';
+import { QrDisplay } from './components/QrDisplay'; // Додаємо імпорт
 import './index.css';
 
 export interface QRConfig {
@@ -32,14 +33,9 @@ export default function App() {
           <InputForm config={config} onChange={updateConfig} />
         </section>
 
+        {/* Замінили жорстко закодований QRCodeCanvas на наш новий компонент */}
         <section className="preview" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <QRCodeCanvas
-            value={config.value || ' '}
-            size={config.size}
-            bgColor={config.bgColor}
-            fgColor={config.fgColor}
-            level="H"
-          />
+          <QrDisplay config={config} />
         </section>
       </main>
     </div>
