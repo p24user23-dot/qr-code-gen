@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# 🚀 QR Generator PRO (Monkey Clone)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Сучасний, швидкий та повністю клієнтський генератор QR-кодів, натхненний функціоналом QRCode Monkey. Побудований на React + TypeScript, працює без бекенду, рендерить високоякісні коди безпосередньо у браузері.
 
-Currently, two official plugins are available:
+🌍 **[Live Demo (GitHub Pages)](https://p24user23-dot.github.io/qr-code-gen/)**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ✨ Фічі (Features)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Продвинута кастомізація**: Зміна форми точок (body) та кутів (eyes).
+- **Кольори та Градієнти**: Повна підтримка кастомних кольорів для фону, точок та рамок.
+- **Ін'єкція логотипу**: Можливість завантажити власну картинку/логотип по центру QR-коду.
+- **Експорт у високій якості**: Миттєве завантаження готового результату у форматах **PNG** (растр) та **SVG** (вектор).
+- **Чуйний UI/UX**: Жорсткий двоколонковий макет із липким (sticky) прев'ю та зручним акордеоном для налаштувань.
+- **Zero Backend**: Уся логіка генерації та завантаження файлів відбувається локально на клієнті через Canvas/DOM.
 
-## Expanding the ESLint configuration
+## 🛠 Технологічний стек
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Framework**: [React 19](https://react.dev/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **QR Engine**: [qr-code-styling](https://qr-code-styling.com/) (ванільний JS-рушій, обгорнутий у React `useRef`/`useEffect`).
+- **Styling**: Native CSS3 (CSS Variables, Grid, Flexbox, Custom scrollbars & inputs).
+- **Deployment**: GitHub Actions -> GitHub Pages.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🚀 Локальний запуск (Getting Started)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Передумови
+
+Переконайтеся, що у вас встановлено [Node.js](https://nodejs.org/) (версія 18+).
+
+### Інсталяція
+
+1. Клонуйте репозиторій:
+
+```bash
+git clone [https://github.com/p24user23-dot/qr-code-gen.git](https://github.com/p24user23-dot/qr-code-gen.git)
+cd qr-code-gen
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Встановіть залежності:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+3.  Запустіть dev-сервер:
+
+```bash
+npm run dev
+```
+
+4. Відкрийте http://localhost:5173 у вашому браузері.
+
+📦 Скрипти
+npm run dev — запуск сервера для розробки з Hot Module Replacement (HMR).
+npm run build — компіляція TypeScript та збірка оптимізованого бандлу для продакшену.
+npm run preview — локальний попередній перегляд зібраного продакшен-білду.
+npm run lint — перевірка коду лінтером (ESLint).
