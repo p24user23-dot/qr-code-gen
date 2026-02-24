@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { QRCodeCanvas } from 'qrcode.react';
+import { useEffect, useRef } from 'react';
+import QRCodeStyling from 'qr-code-styling';
 import type { QRConfig } from '../App';
 
 interface QrDisplayProps {
@@ -7,72 +7,103 @@ interface QrDisplayProps {
 }
 
 export function QrDisplay({ config }: QrDisplayProps) {
-  // Реф для доступу до DOM-елемента, який обгортає наш canvas
-  const qrWrapperRef = useRef<HTMLDivElement>(null);
+  const qrRef = useRef<HTMLDivElement>(null);
+  
+  // Ініціалізуємо інстанс бібліотеки один раз і тримаємо в рефі
+  const qrCode = useRef<QRCodeStyling>(
+    new QRCodeStyling({
+      type: 'svg', // Використовуємо SVG для чіткого рендеру в DOM
+      width: config.size,
+      height: config.size,
+      data: config.value || ' ',
+    })
+  );
 
-  const handleDownloadPNG = () => {
-    if (!qrWrapperRef.current) return;
-
-    // Шукаємо canvas всередині нашої обгортки
-    const canvas = qrWrapperRef.current.querySelector('canvas');
-    if (!canvas) {
-      console.error('Canvas не знайдено');
-      return;
+  // Монтуємо QR-код у DOM при першому рендері
+  useEffect(() => {
+    if (qrRef.current) {
+      qrCode.current.append(qrRef.current);
     }
+  }, []);
 
-    // Конвертуємо canvas у формат PNG
-    const pngUrl = canvas.toDataURL('image/png');
+  // Оновлюємо налаштування при будь-якій зміні config
+  useEffect(() => {
+    qrCode.current.update({
+      width: config.size,
+      height: config.size,
+      data: config.value || ' ',
+      margin: config.margin,
+      backgroundOptions: {
+        color: config.bgColor,
+      },
+      // === ОСЬ ЦЬОГО БЛОКУ НЕ ВИСТАЧАЛО ===
+      dotsOptions: {
+        color: config.dotsColor,
+        type: config.dotsType,
+      },
+      cornersSquareOptions: {
+        color: config.cornersSquareColor,
+        type: config.cornersSquareType,
+      },
+      cornersDotOptions: {
+        color: config.cornersDotColor,
+        type: config.cornersDotType,
+      },
+      // ===================================
+      image: config.image || undefined,
+      imageOptions: {
+        crossOrigin: 'anonymous',
+        margin: 5,
+        imageSize: config.imageSize,
+      },
+    });
+  }, [config]);
 
-    // Створюємо віртуальне посилання для завантаження
-    const downloadLink = document.createElement('a');
-    downloadLink.href = pngUrl;
-    downloadLink.download = `qr-code-${Date.now()}.png`; // Унікальне ім'я файлу
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+  // Вбудовані методи завантаження з бібліотеки
+  const handleDownload = (ext: 'png' | 'svg') => {
+    qrCode.current.download({ extension: ext, name: `qr-code-monkey-clone-${Date.now()}` });
+  };
+
+  const btnStyle = {
+    padding: '0.8rem 1.5rem',
+    fontSize: '1rem',
+    fontWeight: 'bold',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
       
-      {/* Обгортка з рефом */}
+      {/* Контейнер для ін'єкції QR-коду */}
       <div 
-        ref={qrWrapperRef}
+        ref={qrRef}
         style={{ 
-          padding: '1rem', 
-          backgroundColor: config.bgColor, // Рамка навколо QR в колір фону 
+          backgroundColor: '#fff', // Робимо фон контейнера білим для чистого експорту
+          padding: '1rem',
           borderRadius: '12px',
-          display: 'inline-block' 
+          display: 'inline-flex'
         }}
-      >
-        <QRCodeCanvas
-          value={config.value || ' '}
-          size={config.size}
-          bgColor={config.bgColor}
-          fgColor={config.fgColor}
-          level="H"
-        />
-      </div>
+      />
 
-      <button
-        onClick={handleDownloadPNG}
-        style={{
-          padding: '0.8rem 1.5rem',
-          fontSize: '1rem',
-          fontWeight: 'bold',
-          color: '#fff',
-          backgroundColor: '#4CAF50',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
-          transition: 'background-color 0.2s'
-        }}
-        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#45a049'}
-        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4CAF50'}
-      >
-        Завантажити PNG
-      </button>
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <button
+          onClick={() => handleDownload('png')}
+          style={{ ...btnStyle, backgroundColor: '#4CAF50' }}
+        >
+          Завантажити PNG
+        </button>
+        
+        <button
+          onClick={() => handleDownload('svg')}
+          style={{ ...btnStyle, backgroundColor: '#2196F3' }}
+        >
+          Завантажити SVG
+        </button>
+      </div>
     </div>
   );
 }
