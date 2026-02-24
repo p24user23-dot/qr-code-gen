@@ -1,8 +1,45 @@
+/* src/index.css */
+:root {
+  font-family: system-ui, sans-serif;
+  background-color: #121212;
+  color: #ffffff;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 1200px; /* Розширено під 2 колонки */
+  padding: 2rem;
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px; /* Ліворуч - гумовий 1fr, праворуч - жорсткі 400px */
+  gap: 3rem;
+  background: #1e1e1e;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  align-items: start; /* Не дає правій колонці розтягуватися по висоті */
+}
+
+@media (max-width: 900px) {
+  .main-layout {
+    grid-template-columns: 1fr; /* 1 колонка для мобілок і планшетів */
+  }
+}
+
 /* =========================================
    Custom UI Elements (Range, Color, Scrollbar)
    ========================================= */
 
-/* Кастомний скролбар для панелі налаштувань */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -17,10 +54,9 @@
   background: #555;
 }
 
-/* Кастомний input[type="range"] */
 input[type=range] {
   -webkit-appearance: none;
-  appearance: none; /* <-- Додай цей рядок */
+  appearance: none;
   width: 100%;
   background: transparent;
 }
@@ -45,7 +81,6 @@ input[type=range]:focus {
   outline: none;
 }
 
-/* Кастомний input[type="color"] */
 input[type="color"] {
   -webkit-appearance: none;
   appearance: none;
@@ -61,7 +96,6 @@ input[type="color"]::-webkit-color-swatch {
   border-radius: 8px;
 }
 
-/* Стилі для файлового інпуту */
 input[type="file"]::file-selector-button {
   padding: 0.6rem 1.2rem;
   border-radius: 6px;
