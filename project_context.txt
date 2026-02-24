@@ -12,6 +12,8 @@
 │   ├── App.tsx
 │   ├── assets/
 │   │   └── react.svg
+│   ├── components/
+│   │   └── InputForm.tsx
 │   ├── index.css
 │   └── main.tsx
 ├── tsconfig.app.json
@@ -190,116 +192,184 @@ export default defineConfig([
 Файл: src\App.tsx
 =================================================================
 
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.tsx
+import { useState } from 'react';
+import { QRCodeCanvas } from 'qrcode.react';
 
-function App() {
-  const [count, setCount] = useState(0)
+import './index.css'; // App.css нам поки не потрібен
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+// Типізація нашого стану
+export interface QRConfig {
+  value: string;
+  size: number;
+  fgColor: string;
+  bgColor: string;
 }
 
-export default App
+export default function App() {
+  const [config, setConfig] = useState<QRConfig>({
+    value: 'https://github.com/p24user23-dot/qr-code-gen',
+    size: 256,
+    fgColor: '#ffffff', // Білий QR для темної теми
+    bgColor: '#1e1e1e', // В колір фону контейнера
+  });
 
+  // Універсальний хендлер для оновлення полів конфігу
+  const updateConfig = (field: keyof QRConfig, val: string | number) => {
+    setConfig((prev) => ({ ...prev, [field]: val }));
+  };
+
+  return (
+    <div className="app-container">
+      <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>QR Generator PRO</h1>
+      
+      <main className="main-layout">
+        {/* Секція контролів (тимчасово тут, далі винесемо в InputForm.tsx) */}
+        <section className="controls">
+          <h2>Налаштування</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <input
+              type="text"
+              value={config.value}
+              onChange={(e) => updateConfig('value', e.target.value)}
+              placeholder="Введіть текст або URL"
+              style={{ padding: '0.8rem', borderRadius: '6px', border: 'none' }}
+            />
+            {/* Інші контроли додамо при декомпозиції */}
+          </div>
+        </section>
+
+        {/* Секція відображення (тимчасово тут, далі винесемо в QrDisplay.tsx) */}
+        <section className="preview" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <QRCodeCanvas
+            value={config.value || ' '} // Пробіл, щоб бібліотека не крешилась на порожньому рядку
+            size={config.size}
+            bgColor={config.bgColor}
+            fgColor={config.fgColor}
+            level="H" // Рівень корекції помилок High - краще для зчитування, якщо додамо логотип
+          />
+        </section>
+      </main>
+    </div>
+  );
+}
+
+=================================================================
+Файл: src\components\InputForm.tsx
+=================================================================
+
+// src/components/InputForm.tsx
+import { QRConfig } from '../App';
+
+interface InputFormProps {
+  config: QRConfig;
+  onChange: (field: keyof QRConfig, val: string | number) => void;
+}
+
+export function InputForm({ config, onChange }: InputFormProps) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      
+      {/* Введення тексту */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <label htmlFor="qr-text" style={{ fontSize: '0.9rem', color: '#aaa' }}>Текст або URL</label>
+        <input
+          id="qr-text"
+          type="text"
+          value={config.value}
+          onChange={(e) => onChange('value', e.target.value)}
+          placeholder="Введіть дані..."
+          style={{ padding: '0.8rem', borderRadius: '6px', border: 'none', backgroundColor: '#2a2a2a', color: '#fff' }}
+        />
+      </div>
+
+      {/* Налаштування розміру */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <label htmlFor="qr-size" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#aaa' }}>
+          <span>Розмір (px)</span>
+          <span>{config.size}x{config.size}</span>
+        </label>
+        <input
+          id="qr-size"
+          type="range"
+          min="128"
+          max="512"
+          step="8"
+          value={config.size}
+          onChange={(e) => onChange('size', parseInt(e.target.value, 10))}
+          style={{ cursor: 'pointer' }}
+        />
+      </div>
+
+      {/* Налаштування кольорів */}
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label htmlFor="qr-fg" style={{ fontSize: '0.9rem', color: '#aaa' }}>Колір QR</label>
+          <input
+            id="qr- facility"
+            type="color"
+            value={config.fgColor}
+            onChange={(e) => onChange('fgColor', e.target.value)}
+            style={{ width: '100%', height: '40px', cursor: 'pointer', border: 'none', padding: 0, backgroundColor: 'transparent' }}
+          />
+        </div>
+        
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label htmlFor="qr-bg" style={{ fontSize: '0.9rem', color: '#aaa' }}>Колір фону</label>
+          <input
+            id="qr-bg"
+            type="color"
+            value={config.bgColor}
+            onChange={(e) => onChange('bgColor', e.target.value)}
+            style={{ width: '100%', height: '40px', cursor: 'pointer', border: 'none', padding: 0, backgroundColor: 'transparent' }}
+          />
+        </div>
+      </div>
+
+    </div>
+  );
+}
 
 =================================================================
 Файл: src\index.css
 =================================================================
 
+/* src/index.css */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  font-family: system-ui, sans-serif;
+  background-color: #121212;
+  color: #ffffff;
 }
 
 body {
   margin: 0;
   display: flex;
-  place-items: center;
-  min-width: 320px;
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.app-container {
+  width: 100%;
+  max-width: 900px;
+  padding: 2rem;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  background: #1e1e1e;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+@media (max-width: 768px) {
+  .main-layout {
+    grid-template-columns: 1fr;
   }
 }
-
 
 =================================================================
 Файл: src\main.tsx
